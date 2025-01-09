@@ -3,7 +3,7 @@ const db = require('../db');
 // Jest setup configuration
 beforeAll(async () => {
   // Use a separate database for testing
-  process.env.POSTGRES_DB = 'chatgenius_test';
+  process.env.DB_NAME = 'chatgenius_test';
   
   // Add any other test setup here, such as:
   // - Database connection
@@ -13,6 +13,8 @@ beforeAll(async () => {
 
   // Clean up after all tests
 afterAll(async () => {
+  // Drop all tables after tests complete
+  
   await db.pool.end();
-  process.env.POSTGRES_DB = 'chatgenius';
+  process.env.DB_NAME = 'chatgenius';
 });

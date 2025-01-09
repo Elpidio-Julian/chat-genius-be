@@ -12,6 +12,29 @@ const {
   updateWorkspaceService
 } = require('./workspaces');
 
+const {
+  createUserService,
+  getUserByClerkIdService,
+  getUserByIdService,
+  updateUserService,
+  deleteUserService
+} = require('./users');
+
+const {
+  createMessageService,
+  getChannelMessagesService,
+  updateMessageService,
+  deleteMessageService,
+  getThreadMessagesService
+} = require('./messages');
+
+const {
+  createWorkspaceMemberService,
+  getWorkspaceMembersService,
+  updateWorkspaceMemberRoleService,
+  deleteWorkspaceMemberService
+} = require('./workspace_members');
+
 module.exports = {
   // Channel services
   createChannelService,
@@ -23,5 +46,24 @@ module.exports = {
   createWorkspaceService,
   getWorkspacesService,
   getWorkspaceByIdService,
-  updateWorkspaceService
+  updateWorkspaceService,
+  // User services
+  createUserService,
+  getUserByClerkIdService,
+  getUserByIdService,
+  updateUserService,
+  deleteUserService,
+
+  // Message services
+  createMessageService,
+  getChannelMessagesService,
+  updateMessageService,
+  deleteMessageService,
+  getThreadMessagesService,
+
+  // Workspace member services
+  createWorkspaceMemberService,
+  getWorkspaceMembersService,
+  updateWorkspaceMemberRoleService,
+  deleteWorkspaceMemberService
 };

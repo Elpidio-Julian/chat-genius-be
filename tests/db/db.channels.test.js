@@ -1,127 +1,108 @@
-// // Channels
-// POST   /api/workspaces/:workspaceId/channels
-// GET    /api/workspaces/:workspaceId/channels
-// PATCH  /api/workspaces/:workspaceId/channels/:channelId
-// DELETE /api/workspaces/:workspaceId/channels/:channelId
-
-
 const db = require('../../src/db');
-const pool = require('../../src/db');
+const {
+  createChannelService,
+  getChannelsService,
+  updateChannelService,
+  deleteChannelService,
+} = require('../../src/db/services/channels');
+const { createUserService } = require('../../src/db/services/users');
+const { createWorkspaceService } = require('../../src/db/services/workspaces');
 
-jest.mock('../../src/db', () => ({
-  query: jest.fn()
-}));
+describe('Channel Database Services', () => {
+  let testUser;
+  let testWorkspace;
 
+  beforeAll(async () => {
+    // Create a test user
+    testUser = await createUserService({
+      clerk_id: 'test_clerk_channels',
+      email: 'channels_test@example.com',
+      full_name: 'Test Channel User',
+      avatar_url: 'https://example.com/avatar.png'
+    });
 
-describe('Channel Database Operations', () => {
-
-  beforeEach(() => {
-    pool = new Pool();
-    pool.query.mockReset();
+    // Create a test workspace
+    testWorkspace = await createWorkspaceService({
+      name: 'Test Workspace',
+      slug: 'test-workspace-channels'
+    });
   });
 
-  describe('POST /api/workspaces/:workspaceId/channels', () => {
-    it('should insert a new channel', async () => {
-      const mockChannel = {
-        id: 1,
-        workspace_id: 1,
+  beforeEach(async () => {
+    // Clean up channels before each test
+    await db.query('DELETE FROM channels WHERE workspace_id = $1', [testWorkspace.id]);
+  });
+
+  describe('createChannelService', () => {
+    it('should create a new channel successfully', async () => {
+      const channelData = {
         name: 'general',
-        description: 'General channel'
+        description: 'General discussion'
       };
 
-      pool.query.mockResolvedValueOnce({
-        rows: [mockChannel],
-        rowCount: 1
-      });
+      const channel = await createChannelService(testWorkspace.id, channelData, testUser.id);
 
-      const result = await db.query(
-        'INSERT INTO channels (workspace_id, name, description) VALUES ($1, $2, $3) RETURNING *',
-        [1, 'general', 'General channel']
-      );
-
-      expect(pool.query).toHaveBeenCalledWith(
-        'INSERT INTO channels (workspace_id, name, description) VALUES ($1, $2, $3) RETURNING *',
-        [1, 'general', 'General channel']
-      );
-      expect(result.rows[0]).toEqual(mockChannel);
+      expect(channel).toBeDefined();
+      expect(channel.name).toBe(channelData.name);
+      expect(channel.description).toBe(channelData.description);
+      expect(channel.workspace_id).toBe(testWorkspace.id);
+      expect(channel.created_by).toBe(testUser.id);
     });
   });
 
-  describe('GET /api/workspaces/:workspaceId/channels', () => {
-    it('should get all channels for a workspace', async () => {
-      const mockChannels = [
-        { id: 1, workspace_id: 1, name: 'general' },
-        { id: 2, workspace_id: 1, name: 'random' }
-      ];
+  describe('getChannelsService', () => {
+    it('should return all channels in a workspace', async () => {
+      const channelData = {
+        name: 'general',
+        description: 'General discussion'
+      };
 
-      pool.query.mockResolvedValueOnce({
-        rows: mockChannels,
-        rowCount: 2
-      });
+      await createChannelService(testWorkspace.id, channelData, testUser.id);
+      const channels = await getChannelsService(testWorkspace.id);
 
-      const result = await db.query(
-        'SELECT * FROM channels WHERE workspace_id = $1 ORDER BY created_at DESC',
-        [1]
-      );
-
-      expect(pool.query).toHaveBeenCalledWith(
-        'SELECT * FROM channels WHERE workspace_id = $1 ORDER BY created_at DESC',
-        [1]
-      );
-      expect(result.rows).toEqual(mockChannels);
+      expect(channels).toHaveLength(1);
+      expect(channels[0].name).toBe(channelData.name);
     });
   });
 
-  describe('PATCH /api/workspaces/:workspaceId/channels/:channelId', () => {
-    it('should update a channel', async () => {
-      const mockUpdatedChannel = {
-        id: 1,
-        workspace_id: 1,
+  describe('updateChannelService', () => {
+    it('should update channel successfully', async () => {
+      const channel = await createChannelService(
+        testWorkspace.id,
+        { name: 'general', description: 'General discussion' },
+        testUser.id
+      );
+
+      const updatedChannel = await updateChannelService(channel.id, {
         name: 'updated-general',
         description: 'Updated description'
-      };
-
-      pool.query.mockResolvedValueOnce({
-        rows: [mockUpdatedChannel],
-        rowCount: 1
       });
 
-      const result = await db.query(
-        'UPDATE channels SET name = $1, description = $2 WHERE id = $3 RETURNING *',
-        ['updated-general', 'Updated description', 1]
-      );
-
-      expect(pool.query).toHaveBeenCalledWith(
-        'UPDATE channels SET name = $1, description = $2 WHERE id = $3 RETURNING *',
-        ['updated-general', 'Updated description', 1]
-      );
-      expect(result.rows[0]).toEqual(mockUpdatedChannel);
+      expect(updatedChannel.name).toBe('updated-general');
+      expect(updatedChannel.description).toBe('Updated description');
     });
   });
 
-  describe('DELETE /api/workspaces/:workspaceId/channels/:channelId', () => {
-    it('should delete a channel', async () => {
-      const mockDeletedChannel = {
-        id: 1,
-        workspace_id: 1,
-        name: 'general'
-      };
-
-      pool.query.mockResolvedValueOnce({
-        rows: [mockDeletedChannel],
-        rowCount: 1
-      });
-
-      const result = await db.query(
-        'DELETE FROM channels WHERE id = $1 RETURNING *',
-        [1]
+  describe('deleteChannelService', () => {
+    it('should delete channel successfully', async () => {
+      const channel = await createChannelService(
+        testWorkspace.id,
+        { name: 'general', description: 'General discussion' },
+        testUser.id
       );
 
-      expect(pool.query).toHaveBeenCalledWith(
-        'DELETE FROM channels WHERE id = $1 RETURNING *',
-        [1]
-      );
-      expect(result.rows[0]).toEqual(mockDeletedChannel);
+      const deletedChannel = await deleteChannelService(channel.id);
+      expect(deletedChannel.id).toBe(channel.id);
+
+      const channels = await getChannelsService(testWorkspace.id);
+      expect(channels).toHaveLength(0);
     });
+  });
+
+  afterAll(async () => {
+    // Clean up test data
+    await db.query('DELETE FROM workspaces WHERE id = $1', [testWorkspace.id]);
+    await db.query('DELETE FROM users WHERE id = $1', [testUser.id]);
   });
 });
+

@@ -4,14 +4,14 @@
 // PATCH  /api/workspaces/:workspaceId/channels/:channelId
 // DELETE /api/workspaces/:workspaceId/channels/:channelId
 
-const db = require('../db');
+const db = require('../../db');
 
 // Create a new channel in a workspace
-const createChannelService = async (workspaceId, { name, description }) => {
+const createChannelService = async (workspaceId, { name, description }, userId) => {
   try {
     const result = await db.query(
-      'INSERT INTO channels (workspace_id, name, description) VALUES ($1, $2, $3) RETURNING *',
-      [workspaceId, name, description]
+      'INSERT INTO channels (workspace_id, name, description, created_by) VALUES ($1, $2, $3, $4) RETURNING *',
+      [workspaceId, name, description, userId]
     );
 
     return result.rows[0];
