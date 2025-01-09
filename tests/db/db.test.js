@@ -1,4 +1,4 @@
-const db = require('../src/db');
+const db = require('../../src/db');
 
 describe('Database Connection', () => {
   test('can connect to database', async () => {
@@ -10,8 +10,4 @@ describe('Database Connection', () => {
     }
   });
 
-  // Clean up after all tests
-  afterAll(async () => {
-    await db.pool.end(); // You'll need to expose the pool in your db module
-  });
 });

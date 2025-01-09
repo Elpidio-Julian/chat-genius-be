@@ -1,3 +1,5 @@
+const db = require('../db');
+
 // Jest setup configuration
 beforeAll(async () => {
   // Use a separate database for testing
@@ -9,10 +11,8 @@ beforeAll(async () => {
   // - Global test configurations
 });
 
+  // Clean up after all tests
 afterAll(async () => {
-  // Cleanup after all tests complete
-  // For example:
-  // - Close database connections
-  // - Clear test data
-  // - Reset environment variables
+  await db.pool.end();
+  process.env.POSTGRES_DB = 'chatgenius';
 });
