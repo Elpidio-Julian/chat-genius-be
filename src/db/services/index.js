@@ -35,6 +35,13 @@ const {
   deleteWorkspaceMemberService
 } = require('./workspace_members');
 
+const {
+  createMessageReactionService,
+  getMessageReactionsService,
+  deleteMessageReactionService,
+  toggleMessageReactionService
+} = require('./message_reactions');
+
 module.exports = {
   // Channel services
   createChannelService,
@@ -65,5 +72,11 @@ module.exports = {
   createWorkspaceMemberService,
   getWorkspaceMembersService,
   updateWorkspaceMemberRoleService,
-  deleteWorkspaceMemberService
+  deleteWorkspaceMemberService,
+
+  // Message reaction services
+  createMessageReactionService,
+  getMessageReactionsService,
+  deleteMessageReactionService,
+  toggleMessageReactionService
 };
