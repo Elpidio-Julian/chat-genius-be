@@ -1,4 +1,10 @@
 const db = require('../../db');
+const isValidUUID = (uuid) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
+
+
 
 // Create a new user
 const createUserService = async ({ clerk_id, email, full_name, avatar_url }) => {
@@ -33,6 +39,11 @@ const getUserByClerkIdService = async (clerkId) => {
 // Get user by ID
 const getUserByIdService = async (userId) => {
   try {
+
+    if (!isValidUUID(userId)) {
+      return null;
+    }
+
     const result = await db.query(
       'SELECT * FROM users WHERE id = $1',
       [userId]

@@ -14,7 +14,7 @@ beforeAll(async () => {
   // Clean up after all tests
 afterAll(async () => {
   // Drop all tables after tests complete
-  
+
   await db.pool.end();
   process.env.DB_NAME = 'chatgenius';
 });

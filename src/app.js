@@ -6,13 +6,16 @@ const workspacesRouter = require('./routes/workspaces');
 const usersRouter = require('./routes/users');
 const app = express();
 
-
-
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(clerkMiddleware());
+
+// Skip auth middleware in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.use(clerkMiddleware());
+}
+
 // Routes
 app.use('/api/health', healthRouter);
 app.use('/api/workspaces', workspacesRouter);
