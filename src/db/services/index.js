@@ -42,6 +42,13 @@ const {
   toggleMessageReactionService
 } = require('./message_reactions');
 
+const {
+  createChannelMemberService,
+  getChannelMembersService,
+  isChannelMemberService,
+  deleteChannelMemberService
+} = require('./channel_members');
+
 module.exports = {
   // Channel services
   createChannelService,
@@ -54,6 +61,7 @@ module.exports = {
   getWorkspacesService,
   getWorkspaceByIdService,
   updateWorkspaceService,
+
   // User services
   createUserService,
   getUserByClerkIdService,
@@ -78,5 +86,11 @@ module.exports = {
   createMessageReactionService,
   getMessageReactionsService,
   deleteMessageReactionService,
-  toggleMessageReactionService
+  toggleMessageReactionService,
+
+  // Channel member services
+  createChannelMemberService,
+  getChannelMembersService,
+  isChannelMemberService,
+  deleteChannelMemberService
 };
